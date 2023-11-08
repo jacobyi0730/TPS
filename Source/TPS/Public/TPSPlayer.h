@@ -26,9 +26,24 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+public:
+	// 컴포넌트 스프링암, 카메라
+	UPROPERTY(EditAnywhere)
+	class USpringArmComponent* SpringArmComp;
+
+	UPROPERTY(EditAnywhere)
+	class UCameraComponent* CameraComp;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = TPS)
 	FVector Direction;
 
+	// 입력에 대응하는 함수 제작
+	void AxisHorizontal(float value);
+	void AxisVertical(float value);
+	void AxisLookUp(float value);
+	void AxisTurn(float value);
+
+	void ActionJump();
+	void ActionFire();
 };
