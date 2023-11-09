@@ -27,16 +27,27 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 public:
-	// 컴포넌트 스프링암, 카메라
+	// 컴포넌트 스프링암, 카메라, 유탄총
 	UPROPERTY(EditAnywhere)
 	class USpringArmComponent* SpringArmComp;
 
 	UPROPERTY(EditAnywhere)
 	class UCameraComponent* CameraComp;
+	
+	UPROPERTY(EditAnywhere)
+	class USkeletalMeshComponent*	GrenadeGun;
+
+	UPROPERTY(EditAnywhere)
+	class UStaticMeshComponent*		SniperGun;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = TPS)
 	FVector Direction;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class ABullet> BulletFactory;
+
+
 
 	// 입력에 대응하는 함수 제작
 	void AxisHorizontal(float value);
@@ -46,4 +57,6 @@ public:
 
 	void ActionJump();
 	void ActionFire();
+	void ActionChooseGrenadeGun();
+	void ActionChooseSniperGun();
 };
