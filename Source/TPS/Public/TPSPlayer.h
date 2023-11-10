@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -27,7 +27,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 public:
-	// ÄÄÆ÷³ÍÆ® ½ºÇÁ¸µ¾Ï, Ä«¸Ş¶ó, À¯ÅºÃÑ
+	// ì»´í¬ë„ŒíŠ¸ ìŠ¤í”„ë§ì•”, ì¹´ë©”ë¼, ìœ íƒ„ì´
 	UPROPERTY(EditAnywhere)
 	class USpringArmComponent* SpringArmComp;
 
@@ -49,7 +49,7 @@ public:
 
 
 
-	// ÀÔ·Â¿¡ ´ëÀÀÇÏ´Â ÇÔ¼ö Á¦ÀÛ
+	// ì…ë ¥ì— ëŒ€ì‘í•˜ëŠ” í•¨ìˆ˜ ì œì‘
 	void AxisHorizontal(float value);
 	void AxisVertical(float value);
 	void AxisLookUp(float value);
@@ -59,26 +59,35 @@ public:
 	void ActionFire();
 	void ActionChooseGrenadeGun();
 	void ActionChooseSniperGun();
+	void ActionZoomIn();
+	void ActionZoomOut();
+
+	void GrenadeFire();
+	void SniperFire();
 
 
-	//1. Å©·Î½ºÇì¾î, ½º³ªÀÌÆÛ À§Á¬ °øÀåÀ» °¡Áö°íÀÖ´Ù.
+
+	//1. í¬ë¡œìŠ¤í—¤ì–´, ìŠ¤ë‚˜ì´í¼ ìœ„ì ¯ ê³µì¥ì„ ê°€ì§€ê³ ìˆë‹¤.
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UUserWidget> CrosshairUIFactory;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY()
 	class UUserWidget* CrosshairUI;
 	
-	// ½º³ªÀÌÆÛ À§Á¬À» È­¸é¿¡ º¸ÀÌ°Ô ÇÏ°í½Í´Ù.
+	// ìŠ¤ë‚˜ì´í¼ ìœ„ì ¯ì„ í™”ë©´ì— ë³´ì´ê²Œ í•˜ê³ ì‹¶ë‹¤.
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UUserWidget> SniperUIFactory;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY()
 	class UUserWidget* SniperUI;
 
-
-	//3. Å©·Î½ºÇì¾î¸¦ È­¸é¿¡ º¸ÀÌ°Ô ÇÏ°í½Í´Ù.
-	//4. 1¹øÅ°¿Í 2¹øÅ° °¢ Å°¸¦ ´©¸£¸é Å©·Î½ºÇì¾î È¤Àº ½º³ªÀÌÆÛ UI¸¦ º¸ÀÌ°Ô ÇÏ°í½Í´Ù.
-	//5. ½º³ªÀÌÆÛUI°¡ º¸ÀÏ¶§´Â ZoomInÀ» ÇÏ°í½Í°í ±×·¸Áö ¾ÊÀ»¶§´Â ZoomOutÀ» ÇÏ°í½Í´Ù.
+	
+	//3. í¬ë¡œìŠ¤í—¤ì–´ë¥¼ í™”ë©´ì— ë³´ì´ê²Œ í•˜ê³ ì‹¶ë‹¤.
+	//4. 1ë²ˆí‚¤ì™€ 2ë²ˆí‚¤ ê° í‚¤ë¥¼ ëˆ„ë¥´ë©´ í¬ë¡œìŠ¤í—¤ì–´ í˜¹ì€ ìŠ¤ë‚˜ì´í¼ UIë¥¼ ë³´ì´ê²Œ í•˜ê³ ì‹¶ë‹¤.
+	//5. ìŠ¤ë‚˜ì´í¼UIê°€ ë³´ì¼ë•ŒëŠ” ZoomInì„ í•˜ê³ ì‹¶ê³  ê·¸ë ‡ì§€ ì•Šì„ë•ŒëŠ” ZoomOutì„ í•˜ê³ ì‹¶ë‹¤.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = TPS)
 	bool bChooseGrenadeGun;
+	
+	UPROPERTY(EditAnywhere)
+	class UParticleSystem* ExplosionVFXFactory;
 };

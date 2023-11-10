@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Bullet.h"
@@ -10,19 +10,19 @@
 ABullet::ABullet()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	// Ãæµ¹Ã¼¸¦ ·çÆ®·ÎÇÏ°í ¹İÁö¸§À» 12.5f·Î
+	// ì¶©ëŒì²´ë¥¼ ë£¨íŠ¸ë¡œí•˜ê³  ë°˜ì§€ë¦„ì„ 12.5fë¡œ
 	collisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("collisionComp"));
 	SetRootComponent(collisionComp);
 	collisionComp->SetSphereRadius(12.5f);
 	collisionComp->SetCollisionProfileName(TEXT("BlockAll"));
 
-	// ¿Ü°üÀ» Ãæµ¹Ã¼¿¡ ºÙÀÌ°í Å©±â 0.25f
+	// ì™¸ê´€ì„ ì¶©ëŒì²´ì— ë¶™ì´ê³  í¬ê¸° 0.25f
 	meshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("meshComp"));
 	meshComp->SetupAttachment(RootComponent);
 	meshComp->SetRelativeScale3D(FVector(0.25f));
 	meshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	// ÀÌµ¿ÄÄÆ÷³ÍÆ® ¸¸µé°í. ¼Ó·Â¼³Á¤, Æ¨±è¼³Á¤
+	// ì´ë™ì»´í¬ë„ŒíŠ¸ ë§Œë“¤ê³ . ì†ë ¥ì„¤ì •, íŠ•ê¹€ì„¤ì •
 	movementComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("movementComp"));
 	movementComp->InitialSpeed = 3000.f;
 	movementComp->MaxSpeed = 3000.f;
@@ -51,7 +51,7 @@ void ABullet::BeginPlay()
 		1, false);
 
 	//int sum = 0;
-	////[Ä¸Ã³](¸Å°³º¯¼ö)->¹İÈ¯ÀÚ·áÇü{ ±¸Çö }
+	////[ìº¡ì²˜](ë§¤ê°œë³€ìˆ˜)->ë°˜í™˜ìë£Œí˜•{ êµ¬í˜„ }
 	//auto lambdaAddFunc = [&sum](int32 a, int32 b)->void
 	//{
 	//	sum = a + b; 
