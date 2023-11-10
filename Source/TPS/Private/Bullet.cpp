@@ -37,7 +37,27 @@ ABullet::ABullet()
 void ABullet::BeginPlay()
 {
 	Super::BeginPlay();
+
+	FTimerHandle handle;
 	
+	//GetWorld()->GetTimerManager().SetTimer(handle, this, &ABullet::KillMySelf, 1);
+	GetWorld()->GetTimerManager().SetTimer(handle,
+		FTimerDelegate::CreateLambda(
+			[this]()->void
+			{
+				// TO DO :
+				this->Destroy();
+			}),
+		1, false);
+
+	//int sum = 0;
+	////[캡처](매개변수)->반환자료형{ 구현 }
+	//auto lambdaAddFunc = [&sum](int32 a, int32 b)->void
+	//{
+	//	sum = a + b; 
+	//};
+
+	//lambdaAddFunc(10, 20);
 }
 
 // Called every frame
@@ -46,4 +66,9 @@ void ABullet::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
+
+//void ABullet::KillMySelf()
+//{
+//	Destroy();
+//}
 

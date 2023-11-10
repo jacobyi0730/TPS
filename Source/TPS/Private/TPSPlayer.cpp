@@ -7,6 +7,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Engine/SkeletalMesh.h"
 #include "Bullet.h"
+#include "Blueprint/UserWidget.h"
 
 // Sets default values
 ATPSPlayer::ATPSPlayer()
@@ -78,6 +79,11 @@ ATPSPlayer::ATPSPlayer()
 void ATPSPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+
+	//2. 태어날 때 두 개의 위젯을 생성하고싶다.
+	CrosshairUI = CreateWidget(GetWorld(), CrosshairUIFactory);
+	SniperUI = CreateWidget(GetWorld(), SniperUIFactory);
+	
 	// 유탄총을 쥐고 시작하고싶다.
 	ActionChooseGrenadeGun();
 }
@@ -142,20 +148,38 @@ void ATPSPlayer::ActionJump()
 
 void ATPSPlayer::ActionFire()
 {
-	// 총알을 생성해서 유탄총의 총구 소켓 위치에 배치하고싶다.
-	FTransform firePosition = GrenadeGun->GetSocketTransform(TEXT("FirePosition"));
-	GetWorld()->SpawnActor<ABullet>(BulletFactory, firePosition);
+	if (bChooseGrenadeGun)
+	{
+		// 총알을 생성해서 유탄총의 총구 소켓 위치에 배치하고싶다.
+		FTransform firePosition = GrenadeGun->GetSocketTransform(TEXT("FirePosition"));
+		GetWorld()->SpawnActor<ABullet>(BulletFactory, firePosition);
+	}
+	else
+	{
+		// 바라보고
+		// 부딪힌곳에 타격을 입히고싶다.
+	}
 }
 
 void ATPSPlayer::ActionChooseGrenadeGun()
 {
+	bChooseGrenadeGun = true;
 	GrenadeGun->SetVisibility(true);
 	SniperGun->SetVisibility(false);
+	CrosshairUI->AddToViewport();
+	SniperUI->RemoveFromParent();
+
+	CameraComp->FieldOfView = 90;
 }
 
 void ATPSPlayer::ActionChooseSniperGun()
 {
+	bChooseGrenadeGun = false;
 	GrenadeGun->SetVisibility(false);
 	SniperGun->SetVisibility(true);
+	SniperUI->AddToViewport();
+	CrosshairUI->RemoveFromParent();
+
+	CameraComp->FieldOfView = 45;
 }
 

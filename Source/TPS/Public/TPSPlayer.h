@@ -59,4 +59,26 @@ public:
 	void ActionFire();
 	void ActionChooseGrenadeGun();
 	void ActionChooseSniperGun();
+
+
+	//1. 크로스헤어, 스나이퍼 위젯 공장을 가지고있다.
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UUserWidget> CrosshairUIFactory;
+
+	UPROPERTY(EditAnywhere)
+	class UUserWidget* CrosshairUI;
+	
+	// 스나이퍼 위젯을 화면에 보이게 하고싶다.
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UUserWidget> SniperUIFactory;
+
+	UPROPERTY(EditAnywhere)
+	class UUserWidget* SniperUI;
+
+
+	//3. 크로스헤어를 화면에 보이게 하고싶다.
+	//4. 1번키와 2번키 각 키를 누르면 크로스헤어 혹은 스나이퍼 UI를 보이게 하고싶다.
+	//5. 스나이퍼UI가 보일때는 ZoomIn을 하고싶고 그렇지 않을때는 ZoomOut을 하고싶다.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = TPS)
+	bool bChooseGrenadeGun;
 };

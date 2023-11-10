@@ -32,4 +32,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class UProjectileMovementComponent* movementComp;
+
+	//void KillMySelf();
+
 };
