@@ -81,10 +81,16 @@ public:
 	UPROPERTY()
 	class UUserWidget* SniperUI;
 
-	
+	//1. 크로스헤어, 스나이퍼 위젯 공장을 가지고있다.
+	//2. 태어날 때 두 개의 위젯을 생성하고싶다.
 	//3. 크로스헤어를 화면에 보이게 하고싶다.
 	//4. 1번키와 2번키 각 키를 누르면 크로스헤어 혹은 스나이퍼 UI를 보이게 하고싶다.
-	//5. 스나이퍼UI가 보일때는 ZoomIn을 하고싶고 그렇지 않을때는 ZoomOut을 하고싶다.
+	//5. 유탄총을 선택하면 UI를 안보이게 하고싶다.
+	//6. 스나이퍼총을 선택하면 크로스헤어UI를 보이게하고싶다.
+	//7. 마우스 오른쪽 버튼을 Zoom으로 처리하고싶다.
+	//8. ZoomIn일때 스나이퍼UI 만 보이게 하고싶다.
+	//9. ZoomOut일때는 크로스헤어UI 만 보이게 하고싶다.
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = TPS)
 	bool bChooseGrenadeGun;
 	
