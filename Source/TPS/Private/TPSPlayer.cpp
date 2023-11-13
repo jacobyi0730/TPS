@@ -9,6 +9,8 @@
 #include "Bullet.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
+#include "Enemy.h"
+#include "EnemyFSM.h"
 
 // Sets default values
 ATPSPlayer::ATPSPlayer()
@@ -31,7 +33,7 @@ ATPSPlayer::ATPSPlayer()
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequins/Meshes/SKM_Quinn.SKM_Quinn'"));
 
 	// 만약 로드가 성공했다면
-	if (tempMesh.Succeeded())
+	if ( tempMesh.Succeeded() )
 	{
 		// 메시에 넣고싶다.
 		GetMesh()->SetSkeletalMesh(tempMesh.Object);
@@ -54,7 +56,7 @@ ATPSPlayer::ATPSPlayer()
 
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempGrenadeGun(TEXT("/Script/Engine.SkeletalMesh'/Game/Models/FPWeapon/Mesh/SK_FPGun.SK_FPGun'"));
 
-	if (tempGrenadeGun.Succeeded())
+	if ( tempGrenadeGun.Succeeded() )
 	{
 		GrenadeGun->SetSkeletalMesh(tempGrenadeGun.Object);
 		GrenadeGun->SetRelativeLocation(FVector(0, 60, 130));
@@ -67,13 +69,13 @@ ATPSPlayer::ATPSPlayer()
 	// 에셋도 로드해서 적용하고싶다.
 	ConstructorHelpers::FObjectFinder<UStaticMesh> tempSniperGun(TEXT("/Script/Engine.StaticMesh'/Game/Models/SniperGun/sniper1.sniper1'"));
 
-	if (tempSniperGun.Succeeded())
+	if ( tempSniperGun.Succeeded() )
 	{
 		SniperGun->SetStaticMesh(tempSniperGun.Object);
 		SniperGun->SetRelativeLocation(FVector(0, 80, 130));
 		SniperGun->SetRelativeScale3D(FVector(0.15f));
 	}
-	
+
 }
 
 // Called when the game starts or when spawned
@@ -84,7 +86,7 @@ void ATPSPlayer::BeginPlay()
 	//2. 태어날 때 두 개의 위젯을 생성하고싶다.
 	CrosshairUI = CreateWidget(GetWorld(), CrosshairUIFactory);
 	SniperUI = CreateWidget(GetWorld(), SniperUIFactory);
-	
+
 	CrosshairUI->AddToViewport();
 	SniperUI->AddToViewport();
 
@@ -156,7 +158,7 @@ void ATPSPlayer::ActionJump()
 
 void ATPSPlayer::ActionFire()
 {
-	if (bChooseGrenadeGun)
+	if ( bChooseGrenadeGun )
 	{
 		GrenadeFire();
 	}
@@ -187,7 +189,7 @@ void ATPSPlayer::ActionChooseSniperGun()
 
 void ATPSPlayer::ActionZoomIn()
 {
-	if (bChooseGrenadeGun)
+	if ( bChooseGrenadeGun )
 	{
 		return;
 	}
@@ -198,7 +200,7 @@ void ATPSPlayer::ActionZoomIn()
 
 void ATPSPlayer::ActionZoomOut()
 {
-	if (bChooseGrenadeGun)
+	if ( bChooseGrenadeGun )
 	{
 		return;
 	}
@@ -222,11 +224,30 @@ void ATPSPlayer::SniperFire()
 	FVector end = start + CameraComp->GetForwardVector() * 100000.f;
 	FCollisionQueryParams params;
 	// 바라보고
-	if (GetWorld()->LineTraceSingleByChannel(hitResult, start, end, ECollisionChannel::ECC_Visibility))
+	if ( GetWorld()->LineTraceSingleByChannel(hitResult, start, end, ECollisionChannel::ECC_Visibility) )
 	{
 		// 어딘가 부딪혔다.
 		// 그곳에 폭발 이펙트를 생성하고싶다.
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionVFXFactory, FTransform(hitResult.ImpactPoint));
+
+		// 만약 부딪힌 물체가 물리작용을 할 수 있다면
+		auto hitComp = hitResult.GetComponent();
+		if ( hitComp && hitComp->IsSimulatingPhysics() )
+		{
+			// 그 물체에게 힘을 가하고싶다.
+			hitComp->AddForce(-hitResult.ImpactNormal * hitComp->GetMass() * 500000.f);
+		}
+
+		// 그 물체가 Enemy라면
+		AEnemy* enemy = Cast<AEnemy>(hitResult.GetActor());
+		if (enemy)
+		{
+			// 너 맞았어 라고 알려주고싶다.
+			//enemy->EnemyFSM
+			auto fsm = enemy->GetDefaultSubobjectByName(TEXT("EnemyFSM"));
+			UEnemyFSM* enemyFSM = Cast<UEnemyFSM>(fsm);
+			enemyFSM->OnTakeDamage(1);
+		}
 	}
 	else
 	{
