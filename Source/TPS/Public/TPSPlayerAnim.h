@@ -22,4 +22,8 @@ public:
 	// 좌우로 움직이는 속력
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Direction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool IsFalling;
+
 };
