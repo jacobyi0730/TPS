@@ -4,6 +4,7 @@
 #include "EnemyFSM.h"
 #include "TPSPlayer.h"
 #include "Enemy.h"
+#include "Components/CapsuleComponent.h"
 
 // Sets default values for this component's properties
 UEnemyFSM::UEnemyFSM()
@@ -96,6 +97,24 @@ void UEnemyFSM::TickDie()
 		// 파괴되고싶다.
 		Me->Destroy();
 	}
+	else 
+	{
+		// 바닥으로 내려가고 싶다.
+		// P = P0 + vt;
+		//FVector P0 = Me->GetActorLocation();
+		//FVector velocity = FVector::DownVector * 200;
+		//FVector vt = velocity * GetWorld()->GetDeltaSeconds();
+		//Me->SetActorLocation(P0 + vt);
+
+		// 선형보간
+		// 시작 Me->GetActorLocation()
+		// 끝 DieEndLoc
+		// t : ds * 6
+
+		FVector NewLoc = FMath::Lerp(Me->GetActorLocation(), DieEndLoc, GetWorld()->GetDeltaSeconds() * 2);
+
+		Me->SetActorLocation(NewLoc);
+	}
 }
 
 void UEnemyFSM::OnTakeDamage(int32 damage)
@@ -111,6 +130,10 @@ void UEnemyFSM::OnTakeDamage(int32 damage)
 	{
 		//  죽음 상태로 전이하고싶다.
 		SetState(EEnemyState::Die);
+		// 바닥과 충돌하지 않게 충돌설정을 끄고싶다.
+		Me->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+		DieEndLoc = Me->GetActorLocation() + FVector::DownVector * 200;
 	}
 
 }

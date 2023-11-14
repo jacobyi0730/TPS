@@ -16,7 +16,6 @@ enum class EEnemyState : uint8
 	Die		UMETA(DisplayName = "DIE"),
 };
 
-
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class TPS_API UEnemyFSM : public UActorComponent
 {
@@ -64,4 +63,7 @@ public:
 	float DieTime = 2;
 
 	void SetState(EEnemyState next);
+
+	// 죽었을 때 내려갈 목적지를 정하고 싶다.
+	FVector DieEndLoc;
 };
