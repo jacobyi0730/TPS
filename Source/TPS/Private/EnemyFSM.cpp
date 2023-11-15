@@ -5,6 +5,7 @@
 #include "TPSPlayer.h"
 #include "Enemy.h"
 #include "Components/CapsuleComponent.h"
+#include "TPS.h"
 
 // Sets default values for this component's properties
 UEnemyFSM::UEnemyFSM()
@@ -72,7 +73,25 @@ void UEnemyFSM::TickMove()
 
 void UEnemyFSM::TickAttack()
 {
+	// 시간이 흐르다가
+	CurrentTime += GetWorld()->GetDeltaSeconds();
+	// 공격 타격 시간이 되면
+	if (CurrentTime > AttackTime) {
 
+		CurrentTime = 0;
+
+		// 만약 타겟과의 거리를 재고
+		float dist = FVector::Dist(Target->GetActorLocation(), Me->GetActorLocation());
+		// 그 거리가 AttackDistance를 초과한다면
+		if ( dist > AttackDistance ) {
+			// 이동상태로 전이하고싶다.
+			State = EEnemyState::Move;
+		} else {
+			// 공격을 하고싶다.
+			MY_LOG(TEXT("Attack!!!!"));
+		}
+
+	}
 }
 
 void UEnemyFSM::TickDamage()

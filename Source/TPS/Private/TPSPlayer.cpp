@@ -83,6 +83,8 @@ void ATPSPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
+	ActionWalk();
+
 	//2. 태어날 때 두 개의 위젯을 생성하고싶다.
 	CrosshairUI = CreateWidget(GetWorld(), CrosshairUIFactory);
 	SniperUI = CreateWidget(GetWorld(), SniperUIFactory);
@@ -92,6 +94,7 @@ void ATPSPlayer::BeginPlay()
 
 	// 유탄총을 쥐고 시작하고싶다.
 	ActionChooseGrenadeGun();
+
 }
 
 // Called every frame
@@ -129,6 +132,10 @@ void ATPSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	PlayerInputComponent->BindAction(TEXT("Zoom"), IE_Pressed, this, &ATPSPlayer::ActionZoomIn);
 
 	PlayerInputComponent->BindAction(TEXT("Zoom"), IE_Released, this, &ATPSPlayer::ActionZoomOut);
+
+	PlayerInputComponent->BindAction(TEXT("Run"), IE_Pressed, this, &ATPSPlayer::ActionRun);
+
+	PlayerInputComponent->BindAction(TEXT("Run"), IE_Released, this, &ATPSPlayer::ActionWalk);
 }
 
 void ATPSPlayer::AxisHorizontal(float value)
@@ -207,6 +214,16 @@ void ATPSPlayer::ActionZoomOut()
 	CrosshairUI->SetVisibility(ESlateVisibility::Visible);
 	SniperUI->SetVisibility(ESlateVisibility::Hidden);
 	CameraComp->FieldOfView = 90;
+}
+
+void ATPSPlayer::ActionWalk()
+{
+	GetCharacterMovement()->MaxWalkSpeed = 300;
+}
+
+void ATPSPlayer::ActionRun()
+{
+	GetCharacterMovement()->MaxWalkSpeed = 600;
 }
 
 void ATPSPlayer::GrenadeFire()

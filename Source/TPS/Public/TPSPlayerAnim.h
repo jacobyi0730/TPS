@@ -15,6 +15,11 @@ class TPS_API UTPSPlayerAnim : public UAnimInstance
 	GENERATED_BODY()
 	
 public:
+	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+
+	UPROPERTY()
+	class ATPSPlayer* player;
+
 	// 앞뒤로 움직이는 속력
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Speed;
