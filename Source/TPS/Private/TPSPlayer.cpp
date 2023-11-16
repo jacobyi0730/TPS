@@ -51,7 +51,7 @@ ATPSPlayer::ATPSPlayer()
 	// 유탄총을 생성하고 에셋도 적용하고 배치하고싶다.
 	GrenadeGun = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("GrenadeGun"));
 	// 유탄총을 Mesh에 어태치 하고싶다.
-	GrenadeGun->SetupAttachment(GetMesh());
+	GrenadeGun->SetupAttachment(GetMesh(), TEXT("hand_rSocket"));
 	GrenadeGun->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempGrenadeGun(TEXT("/Script/Engine.SkeletalMesh'/Game/Models/FPWeapon/Mesh/SK_FPGun.SK_FPGun'"));
@@ -59,12 +59,15 @@ ATPSPlayer::ATPSPlayer()
 	if ( tempGrenadeGun.Succeeded() )
 	{
 		GrenadeGun->SetSkeletalMesh(tempGrenadeGun.Object);
-		GrenadeGun->SetRelativeLocation(FVector(0, 60, 130));
+		GrenadeGun->SetRelativeLocationAndRotation(
+			FVector(-1.835274f, 2.205643f, -2.518352f),
+			FRotator(9.489230f, 101.377560f, -7.563355f)
+		);
 	}
 
 	// 스나이퍼건을 생성해서 Mesh에 붙이고 싶다.
 	SniperGun = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SniperGun"));
-	SniperGun->SetupAttachment(GetMesh());
+	SniperGun->SetupAttachment(GetMesh(), TEXT("hand_rSocket"));
 	SniperGun->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	// 에셋도 로드해서 적용하고싶다.
 	ConstructorHelpers::FObjectFinder<UStaticMesh> tempSniperGun(TEXT("/Script/Engine.StaticMesh'/Game/Models/SniperGun/sniper1.sniper1'"));
@@ -72,7 +75,10 @@ ATPSPlayer::ATPSPlayer()
 	if ( tempSniperGun.Succeeded() )
 	{
 		SniperGun->SetStaticMesh(tempSniperGun.Object);
-		SniperGun->SetRelativeLocation(FVector(0, 80, 130));
+		SniperGun->SetRelativeLocationAndRotation(
+			FVector(-38.369813f, -6.961525f, 6.490548f),
+			FRotator(10.131268f, 101.024829f, -7.322219f)
+		);
 		SniperGun->SetRelativeScale3D(FVector(0.15f));
 	}
 
@@ -109,6 +115,11 @@ void ATPSPlayer::Tick(float DeltaTime)
 	FVector dir = controllerTransform.TransformVector(Direction);
 	// Direction방향으로 이동하고싶다.
 	AddMovementInput(dir);
+
+	if (CameraShake && false ==CameraShake->IsFinished())
+	{
+		// 카메라 진동 중
+	}
 }
 
 // Called to bind functionality to input
@@ -165,6 +176,8 @@ void ATPSPlayer::ActionJump()
 
 void ATPSPlayer::ActionFire()
 {
+	PlayFireAnim();
+
 	if ( bChooseGrenadeGun )
 	{
 		GrenadeFire();
@@ -257,7 +270,7 @@ void ATPSPlayer::SniperFire()
 
 		// 그 물체가 Enemy라면
 		AEnemy* enemy = Cast<AEnemy>(hitResult.GetActor());
-		if (enemy)
+		if ( enemy )
 		{
 			// 너 맞았어 라고 알려주고싶다.
 			//enemy->EnemyFSM
@@ -270,5 +283,27 @@ void ATPSPlayer::SniperFire()
 	{
 		// 부딪힌 곳이 없다... => 허공
 	}
+}
+
+void ATPSPlayer::PlayFireAnim()
+{
+	// 카메라가 흔들리는 중이라면 중지하고 다시 카메라를 처음부터 흔들고싶다.
+
+	if (CameraShake)
+	{
+		CameraShake->StopShake();
+	}
+	// 플레이어 카메라를 가져오고싶다.
+	// UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
+	auto cameraManager = GetWorld()->GetFirstPlayerController()->PlayerCameraManager;
+	// 그녀석에게 카메라를 흔들어라 라고싶다.
+	CameraShake = cameraManager->StartCameraShake(CameraShakeFactory);
+
+	PlayAnimMontage(FireAnimMontage);
+
+	// 총소리를 내고싶다.
+	UGameplayStatics::PlaySound2D(GetWorld(), FireSound);
+
+
 }
 
