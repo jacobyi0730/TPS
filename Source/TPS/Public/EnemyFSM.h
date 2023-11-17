@@ -12,6 +12,7 @@ enum class EEnemyState : uint8
 	Idle	UMETA(DisplayName = "IDLE"),
 	Move	UMETA(DisplayName = "MOVE"),
 	Attack	UMETA(DisplayName = "ATTACK"),
+
 	Damage	UMETA(DisplayName = "DAMAGE"),
 	Die		UMETA(DisplayName = "DIE"),
 };
@@ -73,4 +74,15 @@ public:
 
 	// 죽었을 때 내려갈 목적지를 정하고 싶다.
 	FVector DieEndLoc;
+
+	// 나의 상태가 바뀔 때 애니메이션의 상태도 바꾸고싶다.
+	// 생성자에서 직접 ABP_Enemy를 로드하고싶다.
+	UPROPERTY()
+	class UEnemyAnim* EnemyAnim;
+
+	UPROPERTY(EditAnywhere)
+	class UAnimMontage* EnemyActionMontage;
+
+	void PlayMontageDamage();
+	void PlayMontageDie();
 };
