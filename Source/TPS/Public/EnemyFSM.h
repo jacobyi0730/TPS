@@ -82,7 +82,13 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class UAnimMontage* EnemyActionMontage;
-
+	
 	void PlayMontageDamage();
 	void PlayMontageDie();
+
+	void OnChangeMoveState();
+
+	// AIController를 이용해서 길찾기를 하고싶다.
+	UPROPERTY()
+	class AAIController* ai;
 };

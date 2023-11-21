@@ -8,6 +8,7 @@
 #include "TPS.h"
 #include "EnemyAnim.h"
 #include "Animation/AnimMontage.h"
+#include "AIController.h"
 
 // Sets default values for this component's properties
 UEnemyFSM::UEnemyFSM()
@@ -28,6 +29,8 @@ void UEnemyFSM::BeginPlay()
 	Me = Cast<AEnemy>(GetOwner());
 
 	EnemyAnim = Cast<UEnemyAnim>(Me->GetMesh()->GetAnimInstance());
+
+	ai = Cast<AAIController>(Me->GetController());
 }
 
 
@@ -64,7 +67,8 @@ void UEnemyFSM::TickMove()
 	// 목적지를 향해서 이동하고싶다.
 	FVector dir = Target->GetActorLocation() - Me->GetActorLocation();
 
-	Me->AddMovementInput(dir.GetSafeNormal());
+	//Me->AddMovementInput(dir.GetSafeNormal());
+	
 	// 만약 공격 가능거리라면
 	if ( dir.Size() <= AttackDistance )
 	{
@@ -101,18 +105,23 @@ void UEnemyFSM::TickAttack()
 
 void UEnemyFSM::TickDamage()
 {
-	// 시간이 흐르다가
-	CurrentTime += GetWorld()->GetDeltaSeconds();
-	// 현재시간이 DamageTime를 초과하면
-	if ( CurrentTime > DamageTime )
-	{
-		// 이동상태로 전이하고싶다.
-		SetState(EEnemyState::Move);
-	}
+	//// 시간이 흐르다가
+	//CurrentTime += GetWorld()->GetDeltaSeconds();
+	//// 현재시간이 DamageTime를 초과하면
+	//if ( CurrentTime > DamageTime )
+	//{
+	//	// 이동상태로 전이하고싶다.
+	//	SetState(EEnemyState::Move);
+	//}
 }
 
 void UEnemyFSM::TickDie()
 {
+	// 만약 EnemyAnim->IsDieDone이 false라면 함수를 바로 종료하고싶다.
+	if ( false == EnemyAnim->IsDieDone )
+	{
+		return;
+	}
 	// 시간이 흐르다가
 	CurrentTime += GetWorld()->GetDeltaSeconds();
 	// 현재시간이 DieTime를 초과하면
@@ -176,11 +185,12 @@ void UEnemyFSM::SetState(EEnemyState next)
 void UEnemyFSM::PlayMontageDamage()
 {
 	FName sectionName = TEXT("Damage0");
-	if (FMath::RandBool())
+	if ( FMath::RandBool() )
 	{
 		sectionName = TEXT("Damage1");
 	}
-	Me->PlayAnimMontage(EnemyActionMontage, 1, sectionName);
+	EnemyAnim->PlayMontageDamage(sectionName);
+	//Me->PlayAnimMontage(EnemyActionMontage, 1, sectionName);
 
 	//int idx = FMath::RandRange(0, 1);
 	//FString str = FString::Printf(TEXT("Damage%d"), idx);
@@ -191,5 +201,12 @@ void UEnemyFSM::PlayMontageDamage()
 
 void UEnemyFSM::PlayMontageDie()
 {
-	Me->PlayAnimMontage(EnemyActionMontage, 1, TEXT("Die"));
+	//Me->PlayAnimMontage(EnemyActionMontage, 1, TEXT("Die"));
+	FName sectionName = TEXT("Die");
+	EnemyAnim->PlayMontageDamage(sectionName);
+}
+
+void UEnemyFSM::OnChangeMoveState()
+{
+	SetState(EEnemyState::Move);
 }

@@ -18,4 +18,19 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool IsAttack;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool IsDieDone;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void PlayMontageDamage(FName sectionName);
+
+	UFUNCTION(BlueprintCallable)
+	void OnDamageEnd();
+
+	UFUNCTION()
+	void AnimNotify_DamageEnd();
+
+	UFUNCTION()
+	void AnimNotify_DieEnd();
 };
