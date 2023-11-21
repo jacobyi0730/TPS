@@ -64,8 +64,14 @@ void UEnemyFSM::TickIdle()
 
 void UEnemyFSM::TickMove()
 {
+	FVector destination = Target->GetActorLocation();
 	// 목적지를 향해서 이동하고싶다.
-	FVector dir = Target->GetActorLocation() - Me->GetActorLocation();
+	FVector dir = destination - Me->GetActorLocation();
+
+
+	ai->MoveToLocation(destination);
+
+
 
 	//Me->AddMovementInput(dir.GetSafeNormal());
 	
