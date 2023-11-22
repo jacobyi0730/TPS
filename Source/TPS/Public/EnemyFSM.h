@@ -56,7 +56,8 @@ public:
 	// 데미지를 입었으면 체력을 1 감소하고싶다.
 	// 체력이 0보다 크면 데미지 상태로 전이하고싶다.
 	// 그렇지 않고 체력이 0 이하라면 죽음 상태로 전이하고싶다. 
-	int32 HP = 2;
+	int32 HP;
+	int32 MaxHP = 3;
 	void OnTakeDamage(int32 damage);
 
 	float CurrentTime;
@@ -95,4 +96,6 @@ public:
 	FVector RandomLocation;
 
 	bool UpdateRandomLocation(FVector origin, float radius, FVector& outLocation);
+
+	void UpdateHP(int32 newHp);
 };

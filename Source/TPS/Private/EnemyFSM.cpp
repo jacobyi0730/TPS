@@ -33,6 +33,9 @@ void UEnemyFSM::BeginPlay()
 	EnemyAnim = Cast<UEnemyAnim>(Me->GetMesh()->GetAnimInstance());
 
 	ai = Cast<AAIController>(Me->GetController());
+
+	HP = 0;
+	UpdateHP(MaxHP);
 }
 
 
@@ -181,8 +184,9 @@ void UEnemyFSM::TickDie()
 void UEnemyFSM::OnTakeDamage(int32 damage)
 {
 	ai->StopMovement();
-	// 데미지를 입었으면 체력을 1 감소하고싶다.
-	HP -= damage;
+	// 데미지 만큼 체력을 감소하고싶다.
+	UpdateHP(-damage);
+
 	if ( HP > 0 ) // 체력이 0보다 크면
 	{
 		//  데미지 상태로 전이하고싶다.
@@ -258,4 +262,13 @@ bool UEnemyFSM::UpdateRandomLocation(FVector origin, float radius, FVector& outL
 	}
 
 	return UpdateRandomLocation(origin, radius, outLocation);
+}
+
+void UEnemyFSM::UpdateHP(int32 newHp)
+{
+	HP = FMath::Max(0, HP + newHp);
+	// UI를 갱신하고 싶다.
+	//HP += newHp;
+	//if ( HP < 0 )
+	//	HP = 0;
 }
