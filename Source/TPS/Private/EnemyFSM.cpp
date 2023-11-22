@@ -9,6 +9,8 @@
 #include "EnemyAnim.h"
 #include "Animation/AnimMontage.h"
 #include "AIController.h"
+#include <../../../../../../../Source/Runtime/NavigationSystem/Public/NavigationSystem.h>
+#include <../../../../../../../Source/Runtime/AIModule/Classes/Navigation/PathFollowingComponent.h>
 
 // Sets default values for this component's properties
 UEnemyFSM::UEnemyFSM()
@@ -69,11 +71,30 @@ void UEnemyFSM::TickMove()
 	FVector dir = destination - Me->GetActorLocation();
 
 
-	ai->MoveToLocation(destination);
-
-
-
-	//Me->AddMovementInput(dir.GetSafeNormal());
+	// 타겟이 길 위에 있다면
+	auto ns = UNavigationSystemV1::GetNavigationSystem(GetWorld());
+	FPathFindingQuery query;
+	FAIMoveRequest req;
+	req.SetAcceptanceRadius(50);
+	req.SetGoalLocation(destination);
+	ai->BuildPathfindingQuery(req, query);
+	auto result = ns->FindPathSync(query);
+	if (result.IsSuccessful())
+	{
+		//  타겟을 향해 이동하고싶다.
+		ai->MoveToLocation(destination);
+	}
+	else // 그렇지 않다면
+	{
+		//  길 위에 랜덤한 위치를 하나 정해서 그곳으로 이동하고싶다.
+		FPathFollowingRequestResult r;
+		r.Code = ai->MoveToLocation(RandomLocation);
+		//  만약 그곳에 도착했거나 문제가 있다면 랜덤한 위치를 갱신하고싶다.
+		if ( r != EPathFollowingRequestResult::RequestSuccessful )
+		{
+			UpdateRandomLocation(Me->GetActorLocation(), 500, RandomLocation);
+		}
+	}
 	
 	// 만약 공격 가능거리라면
 	if ( dir.Size() <= AttackDistance )
@@ -81,6 +102,7 @@ void UEnemyFSM::TickMove()
 		// 공격 상태로 전이하고싶다.
 		SetState(EEnemyState::Attack);
 		CurrentTime = AttackTime;
+		ai->StopMovement();
 	}
 }
 void UEnemyFSM::TickAttack()
@@ -158,6 +180,7 @@ void UEnemyFSM::TickDie()
 
 void UEnemyFSM::OnTakeDamage(int32 damage)
 {
+	ai->StopMovement();
 	// 데미지를 입었으면 체력을 1 감소하고싶다.
 	HP -= damage;
 	if ( HP > 0 ) // 체력이 0보다 크면
@@ -182,6 +205,12 @@ void UEnemyFSM::OnTakeDamage(int32 damage)
 void UEnemyFSM::SetState(EEnemyState next)
 {
 	check(EnemyAnim);
+	// 이동상태로 전이한다면
+	if (next == EEnemyState::Move)
+	{
+		// 랜덤위치를 갱신하고싶다.
+		UpdateRandomLocation(Me->GetActorLocation(), 500, RandomLocation);
+	}
 
 	State = next;
 	EnemyAnim->State = next;
@@ -215,4 +244,18 @@ void UEnemyFSM::PlayMontageDie()
 void UEnemyFSM::OnChangeMoveState()
 {
 	SetState(EEnemyState::Move);
+}
+
+bool UEnemyFSM::UpdateRandomLocation(FVector origin, float radius, FVector& outLocation)
+{
+	auto ns = UNavigationSystemV1::GetNavigationSystem(GetWorld());
+	FNavLocation loc;
+	bool result = ns->GetRandomReachablePointInRadius(origin, radius, loc);
+	if (result)
+	{
+		outLocation = loc.Location;
+		return true;
+	}
+
+	return UpdateRandomLocation(origin, radius, outLocation);
 }

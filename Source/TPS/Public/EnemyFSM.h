@@ -91,4 +91,8 @@ public:
 	// AIController를 이용해서 길찾기를 하고싶다.
 	UPROPERTY()
 	class AAIController* ai;
+
+	FVector RandomLocation;
+
+	bool UpdateRandomLocation(FVector origin, float radius, FVector& outLocation);
 };
