@@ -254,21 +254,24 @@ bool UEnemyFSM::UpdateRandomLocation(FVector origin, float radius, FVector& outL
 {
 	auto ns = UNavigationSystemV1::GetNavigationSystem(GetWorld());
 	FNavLocation loc;
+
 	bool result = ns->GetRandomReachablePointInRadius(origin, radius, loc);
+
 	if (result)
 	{
 		outLocation = loc.Location;
 		return true;
 	}
-
-	return UpdateRandomLocation(origin, radius, outLocation);
+	return false;
 }
 
 void UEnemyFSM::UpdateHP(int32 newHp)
 {
 	HP = FMath::Max(0, HP + newHp);
-	// UI를 갱신하고 싶다.
 	//HP += newHp;
 	//if ( HP < 0 )
 	//	HP = 0;
+	
+	// UI를 갱신하고 싶다.
+	Me->DoDamageUpdateUI(HP, MaxHP);
 }

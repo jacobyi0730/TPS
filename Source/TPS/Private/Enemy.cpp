@@ -76,6 +76,8 @@ void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
+	UE_LOG(LogTemp, Warning, TEXT("AEnemy::BeginPlay"));
+
 }
 
 // Called every frame
