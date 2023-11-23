@@ -98,4 +98,6 @@ public:
 	bool UpdateRandomLocation(FVector origin, float radius, FVector& outLocation);
 
 	void UpdateHP(int32 newHp);
+
+	void InitHP();
 };

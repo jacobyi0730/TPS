@@ -33,9 +33,6 @@ void UEnemyFSM::BeginPlay()
 	EnemyAnim = Cast<UEnemyAnim>(Me->GetMesh()->GetAnimInstance());
 
 	ai = Cast<AAIController>(Me->GetController());
-
-	HP = 0;
-	UpdateHP(MaxHP);
 }
 
 
@@ -274,4 +271,10 @@ void UEnemyFSM::UpdateHP(int32 newHp)
 	
 	// UI를 갱신하고 싶다.
 	Me->DoDamageUpdateUI(HP, MaxHP);
+}
+
+void UEnemyFSM::InitHP()
+{
+	HP = 0;
+	UpdateHP(MaxHP);
 }

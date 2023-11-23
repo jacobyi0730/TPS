@@ -76,6 +76,9 @@ void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// EnemyFSM의 체력을 초기화 하고 싶다.
+	EnemyFSM->InitHP();
+
 	UE_LOG(LogTemp, Warning, TEXT("AEnemy::BeginPlay"));
 
 }
