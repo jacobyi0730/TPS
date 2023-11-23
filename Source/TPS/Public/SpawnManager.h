@@ -28,7 +28,7 @@ public:
 	// - 스폰목록, 생성시간정보, 타이머핸들, 적공장
 	// 필요기능
 	// - 적생성기능
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	TArray<class AEnemySpawn*> SpawnList;
 
 	void MakeSpawnList(bool bUseIterator);

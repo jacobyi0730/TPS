@@ -6,6 +6,7 @@
 #include <../../../../../../../Source/Runtime/Engine/Public/EngineUtils.h>
 #include <../../../../../../../Source/Runtime/Engine/Classes/Kismet/GameplayStatics.h>
 #include "TPS.h"
+#include "Enemy.h"
 
 // Sets default values
 ASpawnManager::ASpawnManager()
@@ -22,8 +23,9 @@ void ASpawnManager::BeginPlay()
 	// SpawnList를 채우고싶다.
 	MakeSpawnList(true);
 
-
 	// 일정시간마다 적을 생성하고싶다.
+	float randTime = FMath::RandRange(makeTimeMin, makeTimeMax);
+	GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &ASpawnManager::MakeEnemy, randTime, false);
 	// 적의 위치는 SpawnList에서 랜덤하게 정하고싶다.
 	// 생성시간도 랜덤으로 정하고싶다.
 }
@@ -37,12 +39,13 @@ void ASpawnManager::Tick(float DeltaTime)
 
 void ASpawnManager::MakeSpawnList(bool bUseIterator)
 {
+	SpawnList.Empty();
 	if ( bUseIterator )
 	{
 		for ( TActorIterator<AEnemySpawn> It(GetWorld()); It; ++It )
 		{
 			SpawnList.Add(*It);
-			MY_LOG(TEXT("%s"), *It->GetName());
+			MY_LOG(TEXT("%s"), *It->GetActorNameOrLabel());
 		}
 	}
 	else
@@ -52,13 +55,33 @@ void ASpawnManager::MakeSpawnList(bool bUseIterator)
 
 		for(AActor* var : temp)
 		{
-			SpawnList.Add(Cast<AEnemySpawn>(var));
+			AEnemySpawn* es = Cast<AEnemySpawn>(var);
+			SpawnList.Add(es);
+			MY_LOG(TEXT("%s"), *es->GetActorNameOrLabel());
 		}
 	}
 }
 
+int prevIndex = -1;
 void ASpawnManager::MakeEnemy()
 {
+	// 이전에 생성했던 위치는 이번에 생성목록에서 제외해주세요.
 
+	int idx = FMath::RandRange(0, SpawnList.Num() - 1);
+	
+	if ( prevIndex == idx)
+	{
+		// idx를 다시 랜덤으로 결정하고 싶다.
+		idx = (idx + 1) % SpawnList.Num();
+		//if ( ++idx >= SpawnList.Num() )
+		//	idx = 0;
+	}
+	
+	FVector spawnLocation = SpawnList[idx]->GetActorLocation();
+
+	GetWorld()->SpawnActor<AEnemy>(EnemyFactory, spawnLocation, FRotator::ZeroRotator);
+
+	float randTime = FMath::RandRange(makeTimeMin, makeTimeMax);
+	GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &ASpawnManager::MakeEnemy, randTime, false);
 }
 
