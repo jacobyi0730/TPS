@@ -11,6 +11,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Enemy.h"
 #include "EnemyFSM.h"
+#include "PlayerMoveComp.h"
+#include "PlayerFireComp.h"
 
 // Sets default values
 ATPSPlayer::ATPSPlayer()
@@ -82,6 +84,10 @@ ATPSPlayer::ATPSPlayer()
 		SniperGun->SetRelativeScale3D(FVector(0.15f));
 	}
 
+	MoveComp = CreateDefaultSubobject<UPlayerMoveComp>(TEXT("MoveComp"));
+
+	FireComp = CreateDefaultSubobject<UPlayerFireComp>(TEXT("FireComp"));
+
 }
 
 // Called when the game starts or when spawned
@@ -89,17 +95,6 @@ void ATPSPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ActionWalk();
-
-	//2. 태어날 때 두 개의 위젯을 생성하고싶다.
-	CrosshairUI = CreateWidget(GetWorld(), CrosshairUIFactory);
-	SniperUI = CreateWidget(GetWorld(), SniperUIFactory);
-
-	CrosshairUI->AddToViewport();
-	SniperUI->AddToViewport();
-
-	// 유탄총을 쥐고 시작하고싶다.
-	ActionChooseGrenadeGun();
 
 }
 
@@ -107,203 +102,15 @@ void ATPSPlayer::BeginPlay()
 void ATPSPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	// Direction을 정규화 하고싶다.
-	Direction.Normalize();
-	// Direction을 컨트롤러를 기준으로 방향을 재정렬하고싶다.
-	FTransform controllerTransform = FTransform(GetControlRotation());
-	FVector dir = controllerTransform.TransformVector(Direction);
-	// Direction방향으로 이동하고싶다.
-	AddMovementInput(dir);
-
-	if (CameraShake && false ==CameraShake->IsFinished())
-	{
-		// 카메라 진동 중
-	}
 }
 
 // Called to bind functionality to input
 void ATPSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	// 입력 함수들을 모두 연결
 
-	PlayerInputComponent->BindAxis(TEXT("Look Up / Down Mouse"), this, &ATPSPlayer::AxisLookUp);
-	PlayerInputComponent->BindAxis(TEXT("Move Forward / Backward"), this, &ATPSPlayer::AxisVertical);
-	PlayerInputComponent->BindAxis(TEXT("Move Right / Left"), this, &ATPSPlayer::AxisHorizontal);
-	PlayerInputComponent->BindAxis(TEXT("Turn Right / Left Mouse"), this, &ATPSPlayer::AxisTurn);
-
-	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &ATPSPlayer::ActionJump);
-	PlayerInputComponent->BindAction(TEXT("Fire"), IE_Pressed, this, &ATPSPlayer::ActionFire);
-
-	PlayerInputComponent->BindAction(TEXT("ChooseGrenadeGun"), IE_Pressed, this, &ATPSPlayer::ActionChooseGrenadeGun);
-
-	PlayerInputComponent->BindAction(TEXT("ChooseSniperGun"), IE_Pressed, this, &ATPSPlayer::ActionChooseSniperGun);
-
-	PlayerInputComponent->BindAction(TEXT("Zoom"), IE_Pressed, this, &ATPSPlayer::ActionZoomIn);
-
-	PlayerInputComponent->BindAction(TEXT("Zoom"), IE_Released, this, &ATPSPlayer::ActionZoomOut);
-
-	PlayerInputComponent->BindAction(TEXT("Run"), IE_Pressed, this, &ATPSPlayer::ActionRun);
-
-	PlayerInputComponent->BindAction(TEXT("Run"), IE_Released, this, &ATPSPlayer::ActionWalk);
+	MoveComp->SetupPlayerInput(PlayerInputComponent);
+	FireComp->SetupPlayerInput(PlayerInputComponent);
 }
 
-void ATPSPlayer::AxisHorizontal(float value)
-{
-	Direction.Y = value;
-}
-
-void ATPSPlayer::AxisVertical(float value)
-{
-	Direction.X = value;
-}
-
-void ATPSPlayer::AxisLookUp(float value)
-{
-	AddControllerPitchInput(value);
-}
-
-void ATPSPlayer::AxisTurn(float value)
-{
-	AddControllerYawInput(value);
-}
-
-void ATPSPlayer::ActionJump()
-{
-	Jump();
-}
-
-void ATPSPlayer::ActionFire()
-{
-	PlayFireAnim();
-
-	if ( bChooseGrenadeGun )
-	{
-		GrenadeFire();
-	}
-	else
-	{
-		SniperFire();
-	}
-}
-
-void ATPSPlayer::ActionChooseGrenadeGun()
-{
-	bChooseGrenadeGun = true;
-	GrenadeGun->SetVisibility(true);
-	SniperGun->SetVisibility(false);
-	CrosshairUI->SetVisibility(ESlateVisibility::Hidden);
-	SniperUI->SetVisibility(ESlateVisibility::Hidden);
-	CameraComp->FieldOfView = 90;
-}
-
-void ATPSPlayer::ActionChooseSniperGun()
-{
-	bChooseGrenadeGun = false;
-	GrenadeGun->SetVisibility(false);
-	SniperGun->SetVisibility(true);
-	CrosshairUI->SetVisibility(ESlateVisibility::Visible);
-	SniperUI->SetVisibility(ESlateVisibility::Hidden);
-}
-
-void ATPSPlayer::ActionZoomIn()
-{
-	if ( bChooseGrenadeGun )
-	{
-		return;
-	}
-	CameraComp->FieldOfView = 45;
-	CrosshairUI->SetVisibility(ESlateVisibility::Hidden);
-	SniperUI->SetVisibility(ESlateVisibility::Visible);
-}
-
-void ATPSPlayer::ActionZoomOut()
-{
-	if ( bChooseGrenadeGun )
-	{
-		return;
-	}
-	CrosshairUI->SetVisibility(ESlateVisibility::Visible);
-	SniperUI->SetVisibility(ESlateVisibility::Hidden);
-	CameraComp->FieldOfView = 90;
-}
-
-void ATPSPlayer::ActionWalk()
-{
-	GetCharacterMovement()->MaxWalkSpeed = 300;
-}
-
-void ATPSPlayer::ActionRun()
-{
-	GetCharacterMovement()->MaxWalkSpeed = 600;
-}
-
-void ATPSPlayer::GrenadeFire()
-{
-	// 총알을 생성해서 유탄총의 총구 소켓 위치에 배치하고싶다.
-	FTransform firePosition = GrenadeGun->GetSocketTransform(TEXT("FirePosition"));
-	GetWorld()->SpawnActor<ABullet>(BulletFactory, firePosition);
-}
-
-void ATPSPlayer::SniperFire()
-{
-	// 카메라의 위치에서 카메라의 앞방향 1km로 바라보고싶다.
-	FHitResult hitResult;
-	FVector start = CameraComp->GetComponentLocation();
-	FVector end = start + CameraComp->GetForwardVector() * 100000.f;
-	FCollisionQueryParams params;
-	// 바라보고
-	if ( GetWorld()->LineTraceSingleByChannel(hitResult, start, end, ECollisionChannel::ECC_Visibility) )
-	{
-		// 어딘가 부딪혔다.
-		// 그곳에 폭발 이펙트를 생성하고싶다.
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionVFXFactory, FTransform(hitResult.ImpactPoint));
-
-		// 만약 부딪힌 물체가 물리작용을 할 수 있다면
-		auto hitComp = hitResult.GetComponent();
-		if ( hitComp && hitComp->IsSimulatingPhysics() )
-		{
-			// 그 물체에게 힘을 가하고싶다.
-			hitComp->AddForce(-hitResult.ImpactNormal * hitComp->GetMass() * 500000.f);
-		}
-
-		// 그 물체가 Enemy라면
-		AEnemy* enemy = Cast<AEnemy>(hitResult.GetActor());
-		if ( enemy )
-		{
-			// 너 맞았어 라고 알려주고싶다.
-			//enemy->EnemyFSM
-			auto fsm = enemy->GetDefaultSubobjectByName(TEXT("EnemyFSM"));
-			UEnemyFSM* enemyFSM = Cast<UEnemyFSM>(fsm);
-			enemyFSM->OnTakeDamage(1);
-		}
-	}
-	else
-	{
-		// 부딪힌 곳이 없다... => 허공
-	}
-}
-
-void ATPSPlayer::PlayFireAnim()
-{
-	// 카메라가 흔들리는 중이라면 중지하고 다시 카메라를 처음부터 흔들고싶다.
-
-	if (CameraShake)
-	{
-		CameraShake->StopShake();
-	}
-	// 플레이어 카메라를 가져오고싶다.
-	// UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
-	auto cameraManager = GetWorld()->GetFirstPlayerController()->PlayerCameraManager;
-	// 그녀석에게 카메라를 흔들어라 라고싶다.
-	CameraShake = cameraManager->StartCameraShake(CameraShakeFactory);
-
-	PlayAnimMontage(FireAnimMontage);
-
-	// 총소리를 내고싶다.
-	UGameplayStatics::PlaySound2D(GetWorld(), FireSound);
-
-
-}
 
