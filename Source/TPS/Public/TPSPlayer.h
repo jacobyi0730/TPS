@@ -6,6 +6,20 @@
 #include "GameFramework/Character.h"
 #include "TPSPlayer.generated.h"
 
+//// 싱글캐스트
+//DECLARE_DELEGATE(FInputSingleDelegate);
+//DECLARE_DELEGATE_OneParam(FInputSingleParamDelegate, int32);
+//// 멀티캐스트
+//DECLARE_MULTICAST_DELEGATE(FInputMultiDelegate);
+//DECLARE_MULTICAST_DELEGATE_OneParam(FInputMultiParamDelegate, FVector);
+//// 블루프린트용 델리게이트 선언
+//DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInputDynamicMultiDelegate);
+//DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInputDynamicMultiParamDelegate, FVector, dir);
+
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FInputDelegate, class UInputComponent*);
+
+
 UCLASS()
 class TPS_API ATPSPlayer : public ACharacter
 {
@@ -14,6 +28,42 @@ class TPS_API ATPSPlayer : public ACharacter
 public:
 	// Sets default values for this character's properties
 	ATPSPlayer();
+public:
+	FInputDelegate OnSetupInputDelegate;
+
+#pragma region Delegate Example
+	//ATPSPlayer(int a)
+//{
+//	// 싱글 캐스트 함수연결
+//	//OnSingleDelegate.BindUFunction(this, TEXT("AA"));
+//	OnSingleDelegate.BindUObject(this, &ATPSPlayer::AA);
+//	// 싱글 캐스트 함수 호출
+//	OnSingleDelegate.Execute();
+
+//	// 멀티 캐스트 함수 연결과 호출
+//	OnMultiDelegate.AddUObject(this, &ATPSPlayer::AA);
+//	OnMultiDelegate.AddUObject(this, &ATPSPlayer::AB);
+
+//	OnMultiDelegate.Broadcast();
+
+//	// 
+//	OnDynamicMultiDelegate.AddDynamic(this, &ATPSPlayer::GetDir);
+
+//	FVector fff;
+//	OnDynamicMultiDelegate.Broadcast(fff);
+//}
+//void AA(){}
+//void AB(){}
+
+//void GetDir(FVector dir) {}
+//FInputSingleDelegate OnSingleDelegate;
+
+//FInputMultiDelegate OnMultiDelegate;
+
+//FInputDynamicMultiParamDelegate OnDynamicMultiDelegate;
+#pragma endregion
+
+
 
 protected:
 	// Called when the game starts or when spawned

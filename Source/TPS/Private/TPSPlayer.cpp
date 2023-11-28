@@ -95,6 +95,7 @@ void ATPSPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
+	UE_LOG(LogTemp, Warning, TEXT("ATPSPlayer::BeginPlay"));
 
 }
 
@@ -107,10 +108,13 @@ void ATPSPlayer::Tick(float DeltaTime)
 // Called to bind functionality to input
 void ATPSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
+	UE_LOG(LogTemp, Warning, TEXT("ATPSPlayer::SetupPlayerInputComponent"));
+
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	MoveComp->SetupPlayerInput(PlayerInputComponent);
-	FireComp->SetupPlayerInput(PlayerInputComponent);
+
+
+	OnSetupInputDelegate.Broadcast(PlayerInputComponent);
 }
 
 

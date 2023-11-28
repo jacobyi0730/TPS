@@ -8,15 +8,26 @@
 UPlayerBaseComp::UPlayerBaseComp()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+	bWantsInitializeComponent = true;
 }
 
 void UPlayerBaseComp::BeginPlay()
 {
+	UE_LOG(LogTemp, Warning, TEXT("UPlayerBaseComp::BeginPlay"));
 	Super::BeginPlay();
-	// 오너를 가져와서 Me에 담고싶다.
-	Me = Cast<ATPSPlayer>(GetOwner());
 }
 
+
+void UPlayerBaseComp::InitializeComponent()
+{
+	UE_LOG(LogTemp, Warning, TEXT("UPlayerBaseComp::InitializeComponent"));
+	Super::InitializeComponent();
+
+	// 오너를 가져와서 Me에 담고싶다.
+	Me = Cast<ATPSPlayer>(GetOwner());
+
+	Me->OnSetupInputDelegate.AddUObject(this, &UPlayerBaseComp::SetupPlayerInput);
+}
 
 // Called every frame
 void UPlayerBaseComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

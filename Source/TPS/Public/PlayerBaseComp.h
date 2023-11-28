@@ -16,11 +16,14 @@ public:
 	// Sets default values for this component's properties
 	UPlayerBaseComp();
 
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
 public:	
+	virtual void InitializeComponent() override;
+
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
