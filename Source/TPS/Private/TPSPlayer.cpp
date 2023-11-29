@@ -13,6 +13,8 @@
 #include "EnemyFSM.h"
 #include "PlayerMoveComp.h"
 #include "PlayerFireComp.h"
+#include "PlayerHpUI.h"
+#include <../../../../../../../Source/Runtime/Engine/Classes/Kismet/GameplayStatics.h>
 
 // Sets default values
 ATPSPlayer::ATPSPlayer()
@@ -94,8 +96,14 @@ ATPSPlayer::ATPSPlayer()
 void ATPSPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+	// 태어날 때 HP를 MaxHP로 하고 HP UI를 생성해서 보이게 하고싶다.
 
-	UE_LOG(LogTemp, Warning, TEXT("ATPSPlayer::BeginPlay"));
+	HP = MaxHP;
+	auto ui = CreateWidget<UPlayerHpUI>(GetWorld(), HpUIFactory);
+
+	ui->AddToViewport(1);
+
+	PlayerHP = Cast<UPlayerHpUI>(ui);
 
 }
 
@@ -117,4 +125,15 @@ void ATPSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	OnSetupInputDelegate.Broadcast(PlayerInputComponent);
 }
 
+void ATPSPlayer::OnMyHit()
+{
+	// 체력을 1 감소하고 UI도 갱신하고싶다.
+	HP -= 10;
+	PlayerHP->UpdateHP(HP, MaxHP);
+	if ( HP <= 0 )
+	{
+		// 게임 오버
+		UGameplayStatics::SetGamePaused(GetWorld(), true);
+	}
+}
 

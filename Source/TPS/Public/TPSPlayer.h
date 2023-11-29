@@ -97,4 +97,16 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	class UPlayerBaseComp* FireComp;
+
+	// 태어날 때 HP를 MaxHP로 하고 HP UI를 생성해서 보이게 하고싶다.
+	int HP;
+	int MaxHP = 100;
+
+	UPROPERTY(EditDefaultsOnly);
+	TSubclassOf<class UPlayerHpUI> HpUIFactory;
+
+	UPROPERTY()
+	class UPlayerHpUI* PlayerHP;
+
+	void OnMyHit();
 };

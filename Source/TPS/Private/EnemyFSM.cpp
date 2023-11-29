@@ -123,11 +123,6 @@ void UEnemyFSM::TickAttack()
 			SetState(EEnemyState::Move);
 			EnemyAnim->IsAttack = false;
 		}
-		else {
-			// 공격을 하고싶다.
-			MY_LOG(TEXT("Attack!!!!"));
-		}
-
 	}
 }
 
