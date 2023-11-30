@@ -69,10 +69,12 @@ void UPlayerFireComp::ActionChooseGrenadeGun()
 	CrosshairUI->SetVisibility(ESlateVisibility::Hidden);
 	SniperUI->SetVisibility(ESlateVisibility::Hidden);
 	Me->CameraComp->FieldOfView = 90;
+	Me->OnChangeGun(true);
 }
 
 void UPlayerFireComp::ActionChooseSniperGun()
 {
+	Me->OnChangeGun(false);
 	bChooseGrenadeGun = false;
 	Me->GrenadeGun->SetVisibility(false);
 	Me->SniperGun->SetVisibility(true);

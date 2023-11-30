@@ -109,4 +109,7 @@ public:
 	class UPlayerHpUI* PlayerHP;
 
 	void OnMyHit();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnChangeGun(bool bGrenadeGun);
 };
