@@ -111,7 +111,8 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class UUserWidget> GameOverUIFactory;
 
-
+	UPROPERTY(EditDefaultsOnly)
+	class UInputMappingContext* InputMapping;
 
 	void OnMyHit();
 

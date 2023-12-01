@@ -4,6 +4,8 @@
 #include "PlayerMoveComp.h"
 #include "TPSPlayer.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include <../../../../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/InputActionValue.h>
+#include <../../../../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputComponent.h>
 
 UPlayerMoveComp::UPlayerMoveComp()
 {
@@ -28,19 +30,29 @@ void UPlayerMoveComp::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	FVector dir = controllerTransform.TransformVector(Direction);
 	// Direction방향으로 이동하고싶다.
 	Me->AddMovementInput(dir);
-
+	// 이동처리 후 방향을 초기화 하고싶다.
+	Direction = FVector::ZeroVector;
 }
 
 void UPlayerMoveComp::SetupPlayerInput(class UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInput(PlayerInputComponent);
 
+	UEnhancedInputComponent* input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+
+	input->BindAction(IA_Move, ETriggerEvent::Triggered, this, &UPlayerMoveComp::IA_AxisMove);
+
+	input->BindAction(IA_Jump, ETriggerEvent::Started, this, &UPlayerMoveComp::IA_ActionJump);
+
+
+	//PlayerInputComponent->BindAxis(TEXT("Move Forward / Backward"), this, &UPlayerMoveComp::AxisVertical);
+	//PlayerInputComponent->BindAxis(TEXT("Move Right / Left"), this, &UPlayerMoveComp::AxisHorizontal);
+	//PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &UPlayerMoveComp::ActionJump);
+
+
 	PlayerInputComponent->BindAxis(TEXT("Look Up / Down Mouse"), this, &UPlayerMoveComp::AxisLookUp);
-	PlayerInputComponent->BindAxis(TEXT("Move Forward / Backward"), this, &UPlayerMoveComp::AxisVertical);
-	PlayerInputComponent->BindAxis(TEXT("Move Right / Left"), this, &UPlayerMoveComp::AxisHorizontal);
 	PlayerInputComponent->BindAxis(TEXT("Turn Right / Left Mouse"), this, &UPlayerMoveComp::AxisTurn);
 
-	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &UPlayerMoveComp::ActionJump);
 
 	PlayerInputComponent->BindAction(TEXT("Run"), IE_Pressed, this, &UPlayerMoveComp::ActionRun);
 
@@ -82,5 +94,16 @@ void UPlayerMoveComp::ActionWalk()
 void UPlayerMoveComp::ActionRun()
 {
 	Me->GetCharacterMovement()->MaxWalkSpeed = 600;
+}
+
+void UPlayerMoveComp::IA_AxisMove(const FInputActionValue& value)
+{
+	FVector2D v = value.Get<FVector2D>();
+	Direction.X = v.X;
+	Direction.Y = v.Y;
+}
+void UPlayerMoveComp::IA_ActionJump()
+{
+	Me->Jump();
 }
 

@@ -15,6 +15,8 @@
 #include "PlayerFireComp.h"
 #include "PlayerHpUI.h"
 #include <../../../../../../../Source/Runtime/Engine/Classes/Kismet/GameplayStatics.h>
+#include <../../../../../../../Source/Runtime/Engine/Classes/GameFramework/PlayerController.h>
+#include <../../../../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputSubsystems.h>
 
 // Sets default values
 ATPSPlayer::ATPSPlayer()
@@ -105,6 +107,14 @@ void ATPSPlayer::BeginPlay()
 
 	PlayerHP = Cast<UPlayerHpUI>(ui);
 
+	APlayerController* pc = Cast<APlayerController>(GetController());
+	auto subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(pc->GetLocalPlayer());
+	
+	if ( subsystem )
+	{
+		subsystem->ClearAllMappings();
+		subsystem->AddMappingContext(InputMapping, 0);
+	}
 }
 
 // Called every frame

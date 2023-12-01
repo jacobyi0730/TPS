@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "PlayerBaseComp.h"
+#include "InputActionValue.h"
 #include "PlayerMoveComp.generated.h"
 
 /**
@@ -37,6 +38,16 @@ public:
 
 	void ActionWalk();
 	void ActionRun();
+
+	UPROPERTY(EditDefaultsOnly)
+	class UInputAction* IA_Move;
+
+	UPROPERTY(EditDefaultsOnly)
+	class UInputAction* IA_Jump;
+
+	void IA_AxisMove(const FInputActionValue& value);
+	void IA_ActionJump();
+
 
 
 };
