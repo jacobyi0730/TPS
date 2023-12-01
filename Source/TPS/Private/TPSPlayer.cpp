@@ -134,6 +134,15 @@ void ATPSPlayer::OnMyHit()
 	{
 		// 게임 오버
 		UGameplayStatics::SetGamePaused(GetWorld(), true);
+
+		// GameOverUI를 만들어서 Viewport에 붙이고 싶다.
+		auto ui = CreateWidget<UUserWidget>(GetWorld(), GameOverUIFactory);
+		ui->AddToViewport();
+		// 커서를 보이게 하고싶다.
+		auto controller = Cast<APlayerController>(GetController());
+		controller->SetShowMouseCursor(true);
+		// 인풋모드를 UI Only로 하고싶다.
+		controller->SetInputMode(FInputModeUIOnly());
 	}
 }
 

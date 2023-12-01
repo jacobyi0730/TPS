@@ -108,8 +108,14 @@ public:
 	UPROPERTY()
 	class UPlayerHpUI* PlayerHP;
 
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class UUserWidget> GameOverUIFactory;
+
+
+
 	void OnMyHit();
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnChangeGun(bool bGrenadeGun);
+
 };
